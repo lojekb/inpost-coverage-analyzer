@@ -45,5 +45,16 @@ With over 90,000 points in the network, standard distribution maps become clutte
 *   **Demographic Heatmaps**: Layering population density data to identify gaps in the most populated areas.
 *   **Locker Availability**: Incorporating real-time locker status from the API to show where capacity is a recurring issue.
 
+## 📸 Screenshots
+
+![Main Map View](screenshots/map_view.png)
+*Visualizing service gaps in Warsaw with a 600m-1200m band-pass filter.*
+
+![Control Panel](screenshots/controls.png)
+*Interactive sliders for real-time distance adjustment.*
+
+![Main Map View](screenshots/map_view2.png)
+*Visualizing service gaps in Warsaw with a 900m-1600m band-pass filter.*
+
 ---
 *Developed as a Technical Assignment for InPost.*
