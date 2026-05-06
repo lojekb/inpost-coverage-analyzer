@@ -33,7 +33,7 @@ async def get_heatmap(
     min_lon: float, 
     max_lat: float, 
     max_lon: float,
-    min_distance: float = Query(300.0), # NOWY PARAMETR
+    min_distance: float = Query(300.0), 
     max_distance: float = Query(1200.0)
 ):
     if not global_kd_tree:
@@ -45,7 +45,7 @@ async def get_heatmap(
         tree=global_kd_tree,
         bbox=bbox,
         grid_size=70,
-        min_distance=min_distance, # PRZEKAZANIE PARAMETRU
+        min_distance=min_distance, 
         max_distance=max_distance
     )
     

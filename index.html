@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>InPost Skaner Pierścieniowy</title>
+    <title>InPost Ring Scanner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     
@@ -24,7 +24,6 @@
             height: 100vh; 
         }
         
-        /* Styl panelu sterowania */
         .control-panel {
             position: absolute;
             top: 20px;
@@ -43,7 +42,7 @@
             margin-top: 0;
             margin-bottom: 20px;
             font-size: 1.4em;
-            color: #f3c200; /* Kolor kojarzący się z InPostem */
+            color: #f3c200;
             text-align: center;
         }
 
@@ -82,29 +81,28 @@
 
 
 <div class="control-panel">
-    <h3>Skaner Pierścieniowy</h3>
+    <h3>Coverage Scanner</h3>
     
     <div class="slider-container">
-        <label>Odległość od (niebieski): <br>
+        <label>Distance from: <br>
             <span id="minVal" style="font-weight:bold; color: #5555ff; font-size: 1.2em;">300</span> m
         </label>
         <input type="range" id="minDist" min="0" max="2500" step="50" value="300">
     </div>
 
     <div class="slider-container">
-        <label>Odległość do (czerwony): <br>
+        <label>Distance to: <br>
             <span id="maxVal" style="font-weight:bold; color: #ff5555; font-size: 1.2em;">1200</span> m
         </label>
         <input type="range" id="maxDist" min="100" max="3000" step="50" value="1200">
     </div>
 
     <p class="info-text">
-        Narzędzie izoluje konkretne pasmo braków maszyn InPost. Obszary poniżej limitu "Od" oraz powyżej limitu "Do" stają się przezroczyste. Przesuń mapę, aby przeliczyć.
+        This tool isolates a specific distance band of missing InPost lockers. Areas below the “From” limit and above the “To” limit become transparent. Pan the map to recalculate.
     </p>
 </div>
 
 <script>
-    // 1. Inicjalizacja ciemnej mapy z centrum na Warszawę
     var map = L.map('map').setView([52.2297, 21.0122], 12); 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -113,42 +111,36 @@
 
     var heatLayer = null;
     
-    // Pobieranie elementów UI
     var sliderMin = document.getElementById('minDist');
     var sliderMax = document.getElementById('maxDist');
     var outMin = document.getElementById('minVal');
     var outMax = document.getElementById('maxVal');
 
-    // 2. Główna funkcja odpytująca backend (FastAPI)
     async function fetchHeatmapData() {
         var bounds = map.getBounds();
         var minDist = parseFloat(sliderMin.value);
         var maxDist = parseFloat(sliderMax.value);
         
-        // Zabezpieczenie przed liczeniem siatki dla całego kraju z bliska (przeciążenie przeglądarki)
         if (map.getZoom() < 10) {
             if (heatLayer) map.removeLayer(heatLayer);
             return; 
         }
 
-        // Budowanie adresu URL z parametrami z suwaków i granicami ekranu
         var url = `/api/heatmap?min_lat=${bounds.getSouth()}&min_lon=${bounds.getWest()}&max_lat=${bounds.getNorth()}&max_lon=${bounds.getEast()}&min_distance=${minDist}&max_distance=${maxDist}`;
         
         try {
             var response = await fetch(url);
             var result = await response.json();
             
-            // Czyszczenie starej warstwy
             if (heatLayer) { map.removeLayer(heatLayer); }
             
-            // Rysowanie nowej mapy cieplnej
             if (result.data && result.data.length > 0) {
                 heatLayer = L.heatLayer(result.data, {
-                    radius: 40,        // Zmusza małe punkty do łączenia się
-                    blur: 20,          // Wygładza krawędzie
+                    radius: 40,
+                    blur: 20,
                     maxZoom: 15,
-                    max: 0.8,          // Próg, od którego zaczyna się kolor czerwony
-                    minOpacity: 0.5,   // Zapobiega zbytniemu znikaniu najniższych wartości
+                    max: 0.8,
+                    minOpacity: 0.5,
                     gradient: {
                         0.2: 'blue', 
                         0.5: 'lime', 
@@ -158,11 +150,10 @@
                 }).addTo(map);
             }
         } catch (error) {
-            console.error("Błąd pobierania danych z backendu:", error);
+            console.error("Failed to fetch data from the backend:", error);
         }
     }
 
-    // 3. Logika walidacji krzyżowej suwaków (Suwak Min nie może minąć Max)
     sliderMin.oninput = function() {
         if (parseFloat(this.value) >= parseFloat(sliderMax.value)) {
             sliderMax.value = parseFloat(this.value) + 50;
@@ -179,16 +170,12 @@
         outMax.innerHTML = this.value;
     }
 
-    // 4. Podpięcie zdarzeń
-    // Przeliczenie backendu tylko wtedy, gdy użytkownik PUSZCI suwak (onchange zamiast oninput)
     sliderMin.onchange = fetchHeatmapData;
     sliderMax.onchange = fetchHeatmapData;
     
-    // Przeliczanie po przesunięciu mapy lub zmianie przybliżenia
     map.on('moveend', fetchHeatmapData);
     map.on('zoomend', fetchHeatmapData);
 
-    // Pierwsze pobranie danych po załadowaniu strony
     setTimeout(fetchHeatmapData, 500);
 </script>
 

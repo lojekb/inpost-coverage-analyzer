@@ -37,9 +37,9 @@ def calculate_viewport_heatmap(
             x, y = transformer_to_meters.transform(lon, lat)
             distance, _ = tree.query((x, y), k=1)
             
-            # Właściwy filtr pasmowoprzepustowy (band-pass)
+            
             if min_distance <= distance <= max_distance:
-                # Zabezpieczenie przed dzieleniem przez zero, gdyby suwaki się zrównały
+                
                 if max_distance == min_distance:
                     weight = 1.0
                 else:
