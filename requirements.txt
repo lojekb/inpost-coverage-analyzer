@@ -1,0 +1,7 @@
+aiohttp>=3.9.0
+scipy>=1.11.3
+pyproj>=3.6.1
+pillow>=10.3.0
+numpy>=1.26.0
+fastapi>=0.104.0
+uvicorn>=0.23.2
